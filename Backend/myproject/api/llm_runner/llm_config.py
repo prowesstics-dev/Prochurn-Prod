@@ -8,8 +8,12 @@
 # from langchain.schema import Generation, LLMResult
 # from loguru import logger
 
+# import os
+# from dotenv import load_dotenv
 
-# GROQ_API_KEY = "REMOVEDx4sevu1Zrp096Df8YkMUWGdyb3FYWRAZROV7i2sFCSb8sRkb0dtH"
+# load_dotenv()
+
+# GROQ_API_KEY = os.getenv("GROQ_API_KEY_Churn")
 
 # class GroqLLM(LLM):
 #     model: str = "meta-llama/llama-4-maverick-17b-128e-instruct"

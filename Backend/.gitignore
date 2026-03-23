@@ -29,7 +29,7 @@ myproject/media/vectorstore_new/admin_base
 myproject/.env
 # myproject/myproject/Excel_Templates/
 celerydb.sqlite
-gmail/
+#gmail/
 db.sqlite3
 *.sqlite3
 # Node/React (if present)

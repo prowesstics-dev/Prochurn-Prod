@@ -6291,7 +6291,7 @@ Please provide only a one-paragraph business recommendation. Do not include SQL 
 """
 
     # API headers
-    GROQ_API_KEY = os.getenv("GROQ_API_KEY")  # Ensure this is set in your environment
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY_Churn")  # Ensure this is set in your environment
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"

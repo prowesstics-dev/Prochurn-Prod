@@ -6,8 +6,12 @@ import re
 from decimal import Decimal
 from json import JSONDecodeError
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # ✅ Use environment variable in production
-GROQ_API_KEY = "REMOVEDx4sevu1Zrp096Df8YkMUWGdyb3FYWRAZROV7i2sFCSb8sRkb0dtH"
+GROQ_API_KEY = os.getenv("GROQ_API_KEY_Churn")
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
 
