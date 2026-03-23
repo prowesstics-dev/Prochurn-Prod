@@ -1,0 +1,496 @@
+/* Upload Page Layout */
+.uploadpage {
+  width: 100%;
+  padding: 50px  0 0 0;
+  background: linear-gradient(to bottom, #f9f9f9, #ffffff);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* 👈 instead of center */
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* height: 100%; */
+  box-sizing: border-box;
+  margin : auto;
+  /* max-width: 1200px; */
+}
+
+.pageTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  background: linear-gradient(to right, #0f172a, #0284c7, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 30px 0 10px 0;
+  width: 100%;
+}
+
+.headercontainer,
+.controlscontainer {
+  display: flex;
+  flex-direction: column; /* Stack title and button vertically */
+  align-items: center;     /* Center horizontally */
+  justify-content: center; /* Center vertically if needed */
+  text-align: center;
+  margin: 0 auto;
+}
+
+/* Header Section */
+.headercontainer {
+    width: 100%;
+    /* max-width: 1200px; */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -50px;
+    z-index: 1;
+}
+
+.titlecontainer {
+    text-align: center;
+    width: 100%;
+}
+
+.welcometext {
+    font-size: 28px;
+    margin-top: -2px;
+    margin-left: 350px;
+    color: #333;
+}
+
+.highlight {
+    color: #007BFF;
+}
+
+.subtext {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+  margin: 0 0 20px 0;
+}
+
+/* Profile Section */
+.profilecontainer {
+    position: relative;
+}
+
+.profileicon {
+    cursor: pointer;
+    color: #007BFF;
+}
+
+/* .profilemenu {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    width: 200px;
+    z-index: 10;
+}
+
+.profilename {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.logoutoption {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+} */
+
+/* Controls Section */
+.controlscontainer {
+  display: flex;
+  justify-content: center; /* Center all items horizontally */
+  align-items: center; 
+  flex-direction: row;    /* Align items vertically */
+  gap: 50px;               /* Space between button and year selector */
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.downloadbtn {
+ display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #28a745, #218838);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+
+.downloadbtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.yearselector {
+   display: flex;
+  align-items: center;
+  gap: 8px; /* Spacing between text, calendar icon, and year */
+  font-size: 16px;
+  white-space: nowrap; /* spacing between "Select Year" text and calendar */
+}
+
+.yeardropdown {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+/* File Upload Section */
+.fileuploadcontainer {
+    display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+    gap: 30px;
+    width: 100%;
+    /* max-width: 1200px; */
+    /* margin-top:190px; */
+    margin-left: 6px;
+}
+
+.filecard {
+    
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.filecard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.fileheader {
+    margin-bottom: 15px;
+}
+
+.filetitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.filelabel {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.required {
+    color: #dc3545;
+    font-size: 20px;
+}
+
+.infoicon {
+    color: #007BFF;
+    cursor: pointer;
+}
+
+/* Tooltip container */
+.tooltipcontainer {
+    position: relative; /* Position relative to the container */
+}
+
+/* Tooltip text */
+.tooltiptext {
+    position: absolute;
+    bottom: 120%; /* Position above the container */
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #0070F3, #003366);
+    color: white;
+    padding: 10px 15px;
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 6px;
+    z-index: 1000;
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 100%;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    opacity: 0; /* Initially hidden */
+    visibility: hidden; /* Initially hidden */
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+/* Tooltip arrow */
+.tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #0070F3 transparent transparent transparent;
+}
+
+/* Show tooltip on hover */
+.fileuploadcontainer:hover .tooltiptext {
+    opacity: 1; /* Make it visible */
+    visibility: visible; /* Make it visible */
+}
+
+
+.fileinputwrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fileinput {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.fileactions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.actionbtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.viewbtn {
+    color: #007BFF;
+}
+
+.viewbtn:hover {
+    background: rgba(0, 123, 255, 0.1);
+}
+
+.removebtn {
+    color: #dc3545;
+}
+
+.removebtn:hover {
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.additionalfiles-container {
+    margin-top: 15px;
+}
+
+.filecount {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.additionalfileslist {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filechip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.filename {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+}
+
+.filechipactions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Process Button */
+.processbtn {
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #007BFF, #0056b3);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    top: 100%;
+    margin-top: 30px;
+    margin-left: 485px;
+}
+
+.backButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  animation: blink 1.2s linear infinite;
+  margin-bottom: 20px;
+  margin-left: 10px;
+  z-index: 2;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+
+.processbtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .uploadpage {
+        margin-left: 0;
+        padding: 15px;
+    }
+    
+    .headercontainer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .controlscontainer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .fileuploadcontainer {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .welcometext {
+        font-size: 24px;
+    }
+    
+    .filecard {
+        padding: 15px;
+}
+}
+
+/* Add to your existing CSS file */
+
+.datepickercontainer {
+    position: relative;
+    display: inline-block;
+}
+
+.calendariconbtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #007BFF;
+    padding: 5px;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+.calendariconbtn:hover {
+    color: #0056b3;
+}
+
+.datepicker {
+    position: absolute;
+    top: 40px; /* Ensure it's placed below the button */
+    left: 0;
+    z-index: 1000;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.selectedYear {
+    font-size: 16px;
+    margin-left: 10px;
+    color: #333;
+}
+
+/* For styling the popper placement */
+.react-datepicker__popper {
+    z-index: 2000 !important;
+}
+
+/* Optional: Style for the year picker */
+.react-datepicker__year-picker {
+    font-size: 14px;
+}
+
+.react-datepicker__header {
+    background-color: #007BFF;
+    color: white;
+    border-radius: 6px 6px 0 0;
+}
+
+.react-datepicker__current-month {
+    font-weight: bold;
+}
+
+@media screen and (max-width: 768px) {
+  .pageTitle {
+    font-size: 20px;
+    text-align: center;
+  }
+  .controlscontainer {
+    flex-direction: column;
+    align-items: center;
+  }
+}

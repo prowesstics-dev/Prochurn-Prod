@@ -1,0 +1,245 @@
+.wrapper {
+  display: flex;
+  /* padding-top: 500px; */
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.leftPanelTitle {
+  font-size: 18px;
+  font-weight: bold;
+  margin-left:12px;
+  padding: 0;
+}
+
+.sidebarExpanded {
+  width: calc(100% - 250px); /* full sidebar width */
+}
+
+.sidebarCollapsed {
+  width: calc(100% - 70px); /* collapsed sidebar width */
+}
+
+.container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  margin-top: 0;
+  padding-top: 0;
+  /* margin-bottom: 0px; prevent double scrollbars */
+}
+
+.leftPanel {
+  width: 100%;
+  max-width: 150px;
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 1.5rem 1rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.leftPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.categoryItem {
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+  font-weight: 500;
+  max-width: 150px;
+  cursor: pointer;
+  color: #4b5563;
+  border-radius: 6px;
+  background-color: #ffff;
+  transition: background-color 0.2s ease;
+}
+
+.categoryList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+
+.categoryItem:hover {
+  background-color: #e5e7eb;
+}
+
+.active {
+  background-color: #dbeafe !important;
+  color: #1d4ed8 !important;
+}
+
+.rightPanel {
+  flex: 1;
+  padding: 1.2rem 2rem 2rem 2rem;
+  overflow-y: auto;
+  height: 100%;
+  /* margin-le: 70px; important to enable scrolling */
+}
+
+
+.heading {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #111827;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.icon {
+  height: 40px;
+  margin-bottom: 1rem;
+  object-fit: contain;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.suggestionBox {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  border: 2px dashed #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.suggestionText {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.8rem;
+}
+
+.suggestionButton {
+  background-color: #1d4ed8;
+  color: #ffffff;
+  font-size: 14px;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.suggestionButton:hover {
+  background-color: #2563eb;
+}
+
+.topBar {
+  position: sticky;
+  background-color: #f9f9f9;
+  z-index: 100;
+  display: flex;
+  justify-content: flex-start; /* from flex-end */
+  align-items: center;
+  padding: 5px;
+  border-bottom: 1px solid #e5e7eb;
+  gap: 1rem; /* add this line for spacing */
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+
+
+
+.dataSearchInput {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 100px; /* Add a reasonable minimum */
+  max-width: 150px; /* Optional */
+  width: 100%;       /* Let it adapt in its container */
+}
+
+
+
+.countBadge {
+  background-color: #e0e7ff;
+  color: #1e40af;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 999px;
+  margin-left: 8px;
+}
+
+.pgWrapper {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pgWrapper input {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.pgWrapper button {
+  padding: 10px 20px;
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  margin-top: 1rem;
+  cursor: pointer;
+}
+
+.backButton {
+  background: transparent;
+  border: none;
+  color: #2563eb;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.backButton:hover {
+  text-decoration: underline;
+  color: #b5b7bd;
+}

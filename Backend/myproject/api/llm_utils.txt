@@ -1,0 +1,417 @@
+
+import json
+import os
+import requests
+import re
+from decimal import Decimal
+from json import JSONDecodeError
+
+# ✅ Use environment variable in production
+GROQ_API_KEY = "REMOVEDqsKKqtzzkf2mAZPLIZckWGdyb3FYtz4GLzaWi1sfN9C6ybZmUpSX"
+GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+
+
+
+
+def sanitize_for_json(data):
+    """Recursively convert Decimal to float for LLM compatibility."""
+    if isinstance(data, dict):
+        return {k: sanitize_for_json(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [sanitize_for_json(v) for v in data]
+    elif isinstance(data, Decimal):
+        return float(data)
+    return data
+
+def clean_llm_json(raw_output):
+    """Remove markdown code fences or common formatting issues."""
+    raw_output = raw_output.strip()
+    if raw_output.startswith("```json"):
+        raw_output = raw_output[7:]
+    elif raw_output.startswith("```"):
+        raw_output = raw_output[3:]
+    if raw_output.endswith("```"):
+        raw_output = raw_output[:-3]
+    return raw_output.strip()
+
+def call_llm(prompt):
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.1,
+        "max_tokens": 1000
+    }
+
+    response = requests.post(f"{GROQ_BASE_URL}/chat/completions", headers=headers, json=payload)
+    response.raise_for_status()
+
+    content = response.json()["choices"][0]["message"]["content"]
+    return clean_llm_json(content)
+
+def detect_chart_type(question, rows, columns, numeric_columns, category_columns):
+    """Intelligently detect the best chart type based on question and data"""
+    question_lower = question.lower()
+    
+    # Time series detection
+    time_keywords = ['trend', 'over time', 'monthly', 'yearly', 'daily', 'weekly', 'timeline', 'growth', 'decline']
+    date_columns = [col for col in columns if any(keyword in col.lower() for keyword in ['date', 'time', 'month', 'year', 'day'])]
+    
+    # Distribution/correlation detection
+    scatter_keywords = ['correlation', 'relationship', 'scatter', 'distribution', 'vs', 'against']
+    
+    # Proportion detection
+    pie_keywords = ['percentage', 'proportion', 'share', 'distribution', 'breakdown', 'composition']
+   
+    
+    # Comparison detection
+    bar_keywords = ['compare', 'comparison', 'versus', 'top', 'bottom', 'ranking', 'highest', 'lowest', 'horizontal']
+    
+   
+   
+    
+    # Check for specific chart types
+   
+    if any(keyword in question_lower for keyword in time_keywords) or date_columns:
+        return 'line'
+    elif (any(keyword in question_lower for keyword in scatter_keywords) and 
+        len(numeric_columns) >= 2):
+        return 'scatter'
+    elif (any(keyword in question_lower for keyword in pie_keywords) and 
+        len(category_columns) == 1 and len(numeric_columns) == 1 and len(rows) <= 10):
+        return 'pie'
+    elif (any(keyword in question_lower for keyword in bar_keywords) or 
+        any(keyword in question_lower for keyword in geo_keywords)):
+        return 'bar'
+    
+    # Default to column chart for comparisons
+    return 'column'
+
+def create_histogram_data(values, bins=10):
+    """Create histogram data from numeric values"""
+    import numpy as np
+    
+    hist, bin_edges = np.histogram(values, bins=bins)
+    categories = []
+    data = []
+    
+    for i in range(len(hist)):
+        categories.append(f"{bin_edges[i]:.1f}-{bin_edges[i+1]:.1f}")
+        data.append(int(hist[i]))
+    
+    return categories, data
+
+def create_chart_config_from_data(question, rows):
+    """Create chart config directly from data without LLM if LLM fails"""
+    try:
+        if not rows or len(rows) == 0:
+            return None
+            
+        # Analyze the data structure
+        first_row = rows[0]
+        columns = list(first_row.keys())
+        
+        # Find numeric columns
+        numeric_columns = []
+        category_columns = []
+        
+        for col in columns:
+            sample_values = [row.get(col) for row in rows[:5]]  # Check first 5 rows
+            if all(isinstance(val, (int, float)) and not isinstance(val, bool) for val in sample_values if val is not None):
+                numeric_columns.append(col)
+            else:
+                category_columns.append(col)
+        
+        if not numeric_columns:
+            return None
+        
+        # Detect the best chart type
+        chart_type = detect_chart_type(question, rows, columns, numeric_columns, category_columns)
+        
+        
+        
+        if chart_type == 'pie':
+            # Pie chart for single category and value
+            if len(category_columns) >= 1 and len(numeric_columns) >= 1:
+                category_col = category_columns[0]
+                value_col = numeric_columns[0]
+                
+                pie_data = []
+                for row in rows:
+                    pie_data.append({
+                        "name": str(row[category_col]),
+                        "y": float(row[value_col])
+                    })
+                
+                return {
+                    "chart": {"type": "pie"},
+                    "title": {"text": f"{question}"},
+                    "series": [{
+                        "name": value_col.replace('_', ' ').title(),
+                        "data": pie_data
+                    }],
+                    "plotOptions": {
+                        "pie": {
+                            "allowPointSelect": True,
+                            "cursor": "pointer",
+                            "dataLabels": {
+                                "enabled": True,
+                                "format": '<b>{point.name}</b>: {point.percentage:.1f} %'
+                            }
+                        }
+                    }
+                }
+        
+        elif chart_type == 'scatter':
+            # Scatter plot for correlation analysis
+            if len(numeric_columns) >= 2:
+                x_col = numeric_columns[0]
+                y_col = numeric_columns[1]
+                
+                scatter_data = []
+                for row in rows:
+                    scatter_data.append([float(row[x_col]), float(row[y_col])])
+                
+                return {
+                    "chart": {"type": "scatter", "zoomType": "xy"},
+                    "title": {"text": f"{question}"},
+                    "xAxis": {
+                        "title": {"text": x_col.replace('_', ' ').title()}
+                    },
+                    "yAxis": {
+                        "title": {"text": y_col.replace('_', ' ').title()}
+                    },
+                    "series": [{
+                        "name": f"{y_col} vs {x_col}",
+                        "data": scatter_data
+                    }]
+                }
+        
+        elif chart_type == 'line':
+            # Line chart for time series or trends
+            if len(category_columns) >= 1 and len(numeric_columns) >= 1:
+                if len(category_columns) >= 2:
+                    # Multiple series line chart
+                    primary_category = category_columns[0]
+                    secondary_category = category_columns[1]  
+                    value_column = numeric_columns[0]
+                    
+                    categories = sorted(list(set(row[primary_category] for row in rows)))
+                    series_names = sorted(list(set(row[secondary_category] for row in rows)))
+                    
+                    series_data = []
+                    for series_name in series_names:
+                        data_points = []
+                        for category in categories:
+                            matching_row = next((row for row in rows 
+                                               if row[primary_category] == category 
+                                               and row[secondary_category] == series_name), None)
+                            data_points.append(float(matching_row[value_column]) if matching_row else 0)
+                        
+                        series_data.append({
+                            "name": str(series_name),
+                            "data": data_points
+                        })
+                    
+                    return {
+                        "chart": {"type": "line"},
+                        "title": {"text": f"{question}"},
+                        "xAxis": {
+                            "categories": [str(cat) for cat in categories],
+                            "title": {"text": primary_category.replace('_', ' ').title()}
+                        },
+                        "yAxis": {
+                            "title": {"text": value_column.replace('_', ' ').title()}
+                        },
+                        "series": series_data
+                    }
+                else:
+                    # Single series line chart
+                    category_col = category_columns[0]
+                    value_col = numeric_columns[0]
+                    
+                    categories = [str(row[category_col]) for row in rows]
+                    values = [float(row[value_col]) for row in rows]
+                    
+                    return {
+                        "chart": {"type": "line"},
+                        "title": {"text": f"{question}"},
+                        "xAxis": {
+                            "categories": categories,
+                            "title": {"text": category_col.replace('_', ' ').title()}
+                        },
+                        "yAxis": {
+                            "title": {"text": value_col.replace('_', ' ').title()}
+                        },
+                        "series": [{
+                            "name": value_col.replace('_', ' ').title(),
+                            "data": values
+                        }]
+                    }
+        
+        # Default handling for column/bar charts
+        if len(category_columns) >= 2 and len(numeric_columns) >= 1:
+            # Grouped data (like policy_tenure + is_churn + policy_count)
+            primary_category = category_columns[0]  # policy_tenure
+            secondary_category = category_columns[1]  # is_churn
+            value_column = numeric_columns[0]  # policy_count
+            
+            # Group data for series
+            categories = sorted(list(set(row[primary_category] for row in rows)))
+            series_names = sorted(list(set(row[secondary_category] for row in rows)))
+            
+            series_data = []
+            for series_name in series_names:
+                data_points = []
+                for category in categories:
+                    # Find matching row
+                    matching_row = next((row for row in rows 
+                                       if row[primary_category] == category 
+                                       and row[secondary_category] == series_name), None)
+                    data_points.append(float(matching_row[value_column]) if matching_row else 0)
+                
+                series_data.append({
+                    "name": str(series_name),
+                    "data": data_points
+                })
+            
+            return {
+                "chart": {"type": chart_type},
+                "title": {"text": f"{question}"},
+                "xAxis": {
+                    "categories": [str(cat) for cat in categories],
+                    "title": {"text": primary_category.replace('_', ' ').title()}
+                },
+                "yAxis": {
+                    "title": {"text": value_column.replace('_', ' ').title()}
+                },
+                "series": series_data
+            }
+        
+        elif len(category_columns) == 1 and len(numeric_columns) >= 1:
+            # Simple category vs value chart
+            category_col = category_columns[0]
+            value_col = numeric_columns[0]
+            
+            categories = [str(row[category_col]) for row in rows]
+            values = [float(row[value_col]) for row in rows]
+            
+            return {
+                "chart": {"type": chart_type},
+                "title": {"text": f"{question}"},
+                "xAxis": {
+                    "categories": categories,
+                    "title": {"text": category_col.replace('_', ' ').title()}
+                },
+                "yAxis": {
+                    "title": {"text": value_col.replace('_', ' ').title()}
+                },
+                "series": [{
+                    "name": value_col.replace('_', ' ').title(),
+                    "data": values
+                }]
+            }
+            
+        return None
+        
+    except Exception as e:
+        print("❌ Fallback chart creation error:", e)
+        return None
+    
+    
+import json
+from json import JSONDecodeError
+
+def llm_generate_chart_config(question, rows):
+    try:
+        if len(rows) == 1 and len(rows[0]) == 1:
+            # Skip chart generation if it's just one value
+            return None
+
+        sanitized_rows = sanitize_for_json(rows[:10])
+        table_preview = json.dumps(sanitized_rows, indent=2)
+
+        chart_prompt = f"""
+You are a BI dashboard expert. Based on the user question and the following data (JSON array of rows),
+return a valid Highcharts JSON configuration. 
+
+IMPORTANT RULES:
+1. Return ONLY valid JSON - no explanations, no comments, no markdown
+2. Choose the BEST chart type based on question intent and data:
+   - "column" for category comparisons and counts
+   - "bar" for rankings, geographic data, or long category names
+   - "line" for trends, time series, or growth analysis
+   - "pie" for proportions/percentages of a whole (max 8 categories)
+   - "scatter" for correlations between two numeric variables
+   
+4. Ensure xAxis.categories is an array of strings or numbers
+5. Ensure series data arrays contain only numbers (except for special types)
+6. For pie/donut charts, use format: [{{"name": "Category", "y": value}}]
+7. For scatter plots, use format: [[x, y], [x, y], ...]
+8. Include proper titles and axis labels
+9. Add appropriate plotOptions for enhanced visualization
+
+Question: {question}
+Data:
+{table_preview}
+
+Return valid Highcharts config JSON:
+""".strip()
+
+        raw_output = call_llm(chart_prompt)
+        chart_config = json.loads(raw_output)
+
+        # Validate the chart config structure
+        if not isinstance(chart_config, dict) or 'series' not in chart_config:
+            print("⚠️ Invalid chart config from LLM, using fallback")
+            return create_chart_config_from_data(question, rows)
+
+        return chart_config
+
+    except JSONDecodeError as json_err:
+        print("❌ JSON Parsing Error:", json_err)
+        print("⚠️ Raw Output was:", raw_output)
+        return create_chart_config_from_data(question, rows)
+    except Exception as e:
+        print("❌ LLM Chart Generation Error:", e)
+        return create_chart_config_from_data(question, rows)
+
+
+def generate_chart_and_response(question, rows):
+    """Main function to generate chart config with fallbacks"""
+    try:
+        chart_config = llm_generate_chart_config(question, rows)
+        print("📊 Chart config:", chart_config)
+    except Exception as chart_err:
+        print("⚠️ Chart generation failed:", chart_err)
+        return None, rows
+
+    # Ensure series data is properly formatted based on chart type
+    if chart_config and 'series' in chart_config:
+        chart_type = chart_config.get('chart', {}).get('type', 'column')
+
+        for series in chart_config['series']:
+            if 'data' in series:
+                if chart_type in ['pie', 'donut']:
+                    if isinstance(series['data'][0], dict):
+                        for point in series['data']:
+                            if 'y' in point:
+                                point['y'] = float(point['y']) if point['y'] is not None else 0
+
+                elif chart_type == 'scatter':
+                    series['data'] = [
+                        [float(point[0]) if point[0] is not None else 0,
+                         float(point[1]) if point[1] is not None else 0]
+                        for point in series['data'] if len(point) >= 2
+                    ]
+
+                
+                else:
+                    series['data'] = [
+                        float(x) if x is not None else 0 for x in series['data']
+                    ]
+
+    return chart_config

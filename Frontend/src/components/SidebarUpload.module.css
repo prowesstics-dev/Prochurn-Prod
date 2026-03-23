@@ -1,0 +1,355 @@
+/* Updated CSS to prevent content shifting */
+.sidebar {
+    margin-top: -25px;
+    width: 250px;
+    transition: width 0.3s ease;
+    height: 100vh;
+    background-color: #1a1a2e;
+    color: white;
+    padding: 20px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    font-family: var(--app-font-family);
+    /* Key fix: Make sidebar overlay instead of push */
+    transform: translateX(-180px); /* Hide most of sidebar when collapsed */
+}
+
+.sidebar.collapsed {
+    width: 70px;
+    transform: translateX(0); /* Show only icon portion */
+}
+
+.sidebar:not(.collapsed) {
+    transform: translateX(0); /* Show full sidebar when expanded */
+    /* Add backdrop shadow when expanded */
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Rest of your existing sidebar styles remain the same */
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: #34495e;
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background-color: #2c3e50;
+}
+
+.brandLogo {
+    display: flex;
+    align-items: center;
+    padding: 0 20px 20px;
+    border-bottom: 1px solid #34495e;
+    margin-bottom: 20px;
+}
+
+.brandIcon {
+    font-size: 28px;
+    font-family: var(--app-font-family);
+    color: #4cc9f0;
+}
+
+.sidebarTitle {
+    font-size: 16px;
+    font-family: var(--app-font-family);
+    font-weight: 600;
+    color: white;
+    margin-left: 10px;
+    text-transform: uppercase;
+}
+
+.sectionHeader {
+    font-size: 11px;
+    font-family: var(--app-font-family);
+    font-weight: bold;
+    color: #a5b1c2;
+    margin: 10px 18px 5px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.sidebarMenu {
+    display: flex;
+    flex-direction: column;
+    padding: 0 15px;
+}
+
+.sidebarItem {
+    margin-bottom: 5px;
+}
+
+.sidebarLink {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    color: #ecf0f1;
+    font-size: 13.5px;
+    font-family: var(--app-font-family);
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-transform: none;
+    margin-bottom: 3px;
+}
+
+.sidebarLink:hover {
+    background: linear-gradient(
+        to right,
+        rgba(106, 90, 205, 0.55),
+        rgba(209, 107, 165, 0.55)
+    );
+    color: #4cc9f0;
+    border-radius: 12px;
+}
+
+.sidebarLink.active {
+    background: linear-gradient(
+        to right,
+        rgba(106, 90, 205, 0.25),
+        rgba(209, 107, 165, 0.25)
+    );
+    color: #4cc9f0;
+    border-radius: 12px;
+}
+
+.icon {
+    margin-right: 12px;
+    font-size: 18px;
+    font-family: var(--app-font-family);
+}
+
+.arrow {
+    margin-left: auto;
+    font-size: 14px;
+    font-family: var(--app-font-family);
+    transition: transform 0.2s ease;
+}
+
+.sidebarSubmenu {
+    padding-left: 15px;
+    margin-top: 5px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.sidebarSubLink {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 25px;
+    color: #bdc3c7;
+    font-size: 13px;
+    font-family: var(--app-font-family);
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-bottom: 2px;
+    text-transform: none;
+}
+
+.sidebarSubLink:hover {
+    background-color: #16213e;
+    color: #4cc9f0;
+}
+
+.sidebarSubLink.active {
+    background-color: #16213e;
+    color: #4cc9f0;
+    font-weight: 600;
+    font-family: var(--app-font-family);
+}
+
+.activeSub {
+    background-color: #16213e;
+    color: #4cc9f0;
+    font-weight: 600;
+    font-family: var(--app-font-family);
+}
+
+.collapsed .sidebarTitle {
+    display: none;
+}
+
+.collapsed .sidebarMenu span {
+    display: none;
+}
+
+.collapsed .sidebarLink {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.collapsed .sidebarSubLink {
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.collapsed .arrow {
+    display: none;
+}
+
+.collapsed .sidebarSubmenu {
+    display: none;
+}
+
+.collapsed .icon {
+    margin-right: 0;
+    font-size: 20px;
+    font-family: var(--app-font-family);
+}
+
+/* Updated toggle button positioning */
+.toggleButton {
+    position: fixed;
+    top: 90px;
+    left: 50px; /* Position relative to collapsed sidebar */
+    background-color: #4cc9f0;
+    color: white;
+    border: none;
+    font-size: 10px;
+    font-family: var(--app-font-family);
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1001; /* Higher than sidebar */
+    transition: left 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.toggleButton:hover {
+    background-color: #3aa8d8;
+}
+
+/* When sidebar is expanded, move toggle button */
+.sidebar:not(.collapsed) + .toggleButton,
+.toggleButton:not(.collapsedToggle) {
+    left: 230px;
+}
+
+.collapsedToggle {
+    left: 50px;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid #34495e;
+    margin: 15px 10px;
+}
+
+.dividerTitle {
+    border: none;
+    border-top: 1px solid #34495e;
+    margin: 15px 10px;
+    margin-top: -10px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        width: 280px; /* Wider on mobile */
+    }
+
+    .sidebar:not(.collapsed) {
+        transform: translateX(0);
+    }
+    
+    .sidebar.collapsed {
+        transform: translateX(-100%);
+    }
+    
+    .toggleButton {
+        left: 20px;
+    }
+    
+    .collapsedToggle {
+        left: 20px;
+    }
+}
+
+.logoBrand {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
+    animation: popUp 0.8s ease-out;
+}
+
+.fullText {
+    font-family: var(--app-font-family);
+    font-size: 2rem;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 1px;
+    background: linear-gradient(to right, #1e356b, #0284c7, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: transform 0.3s ease, letter-spacing 0.3s ease;
+}
+
+.ai {
+    font-family: var(--app-font-family);
+    font-size: 2.5rem;
+    font-weight: 700;
+    font-style: normal;
+    color: #d16ba5;
+    transition: transform 0.3s ease, letter-spacing 0.3s ease;
+}
+
+.logoBrand:hover .fullText,
+.logoBrand:hover .ai {
+    transform: scale(1.05);
+    letter-spacing: 1.5px;
+}
+
+@keyframes popUp {
+    0% {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+
+.customTooltip .ant-tooltip-inner {
+    background: linear-gradient(to right, #6a5acd, #d16ba5);
+    color: white;
+    font-size: 12px;
+    font-family: var(--app-font-family);
+    padding: 6px 12px;
+}
+
+.customTooltip .ant-tooltip-arrow::before {
+    background: linear-gradient(
+        to right,
+        rgba(106, 90, 205, 0.85),
+        rgba(209, 107, 165, 0.85)
+    );
+}

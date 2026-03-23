@@ -1,0 +1,153 @@
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 60px;
+  width: 100%;
+  z-index: 999; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+  padding: 0 20px;
+
+  background-color: transparent; /* ✅ No visible fill */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  transition: background-color 0.3s ease;
+}
+
+
+@supports (backdrop-filter: blur(20px)) {
+  .topbar {
+    background-color: rgba(255, 255, 255, 0.2); /* ✅ light blur tint */
+  }
+  .topbar.dark {
+    background-color: rgba(20, 20, 20, 0.2);
+  }
+}
+
+.topbarExpanded {
+  left: 250px;
+  width: calc(100% - 250px);
+}
+
+.topbarCollapsed {
+  left: 70px;
+  width: calc(100% - 70px);
+}
+
+/* ✅ REMOVE this unless needed */
+.scrolled {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+
+
+@supports (backdrop-filter: blur(20px)) {
+  .topbar {
+    background-color: rgba(255, 255, 255, 0.2); /* transparent glass look */
+  }
+
+  .topbar.dark {
+    background-color: rgba(20, 20, 20, 0.25); /* dark transparent variant */
+  }
+}
+
+
+
+
+
+
+
+
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #374151;
+}
+
+.userSection {
+  position: relative;
+  margin-right:6px;
+}
+
+.userBtn {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 0.5rem;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.userEmail {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 48px;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  padding: 0.5rem;
+  width: 200px;
+  z-index: 200;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  color: #374151;
+}
+
+.dropdownItem:hover {
+  background-color: #f3f4f6;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 0.5rem 0;
+}
+
+.topbarExpanded {
+  left: 250px;
+  width: calc(100% - 250px);
+}
+
+.topbarCollapsed {
+  left: 70px;
+  width: calc(100% - 70px);
+}

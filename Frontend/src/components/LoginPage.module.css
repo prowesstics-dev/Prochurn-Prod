@@ -1,0 +1,380 @@
+/* LoginPage.module.css */
+
+/* Main Container */
+.loginContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3c72, #2a5298, #6a5acd);
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    position: relative;
+  }
+
+  .secondaryButton {
+  padding: 10px 16px;
+  background: #4b7bec;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+  position: relative;  /* ✅ Add this */
+  z-index: 10;
+}
+  
+  /* Login Box */
+  .loginBox {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 420px;
+    margin-bottom: 20px; /* Reduced from 30px to bring footer up */
+    transition: all 0.3s ease;
+    margin-top: -18px;
+    animation: fadeIn 0.8s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .logoContainer {
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  .logoContainer h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-top: -10px;
+  }
+  
+  .highlight {
+    color: #3498db;
+    font-weight: 800;
+  }
+  
+  /* Form Container */
+  .formContainer {
+    display: flex;
+    flex-direction: column;
+    /* padding: '60px'; */
+    /* margin-bottom: 70px; */
+    gap: 10px;
+  }
+  
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: -5px;
+    margin-bottom: 20px;
+    /* background-color: black; */
+  }
+  
+  .formLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: #34495e;
+  }
+  
+  .formInput {
+    padding: 14px;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+  }
+  
+  .formInput:focus {
+    border-color: #3498db;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    outline: none;
+  }
+  
+  /* Login Button */
+  .loginBtn {
+    padding: 14px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .loginBtn:hover {
+    background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .loginBtn:active {
+    transform: translateY(0);
+  }
+  
+  /* Sign Up Link */
+  .signUpContainer {
+    text-align: center;
+    margin-top: -10px;
+  }
+  
+  .signUpText {
+    color: #7f8c8d;
+    font-size: 14px;
+  }
+  
+  .signUpLink {
+    color: #3498db;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 10;              /* Make sure it’s above background */
+    pointer-events: auto;
+  }
+  
+  .signUpLink:hover {
+    color: #2980b9;
+    text-decoration: underline;
+  }
+  
+  /* Footer - Moved up */
+  .footer {
+  width: 100%;
+  max-width: 420px;
+  margin-top: -10px;
+  padding: 16px 0;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  font-size: 13.5px;
+  font-weight: 400;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1;
+}
+
+.footerItem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.footerItem a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 400;
+  transition: opacity 0.2s ease;
+}
+
+.footerItem a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+  
+  /* Responsive Design */
+  @media (max-width: 480px) {
+    .loginBox {
+      padding: 30px 20px;
+      max-width: 90%;
+      margin-bottom: 15px; /* Adjusted for mobile */
+    }
+    
+    .logoContainer h1 {
+      font-size: 24px;
+    }
+    
+    .formInput {
+      padding: 12px;
+    }
+    
+    .loginBtn {
+      padding: 12px;
+    }
+    
+    .footer {
+      padding: 12px;
+      max-width: 90%;
+      margin-top: -5px; /* Less pull-up on mobile */
+    }
+  }
+
+
+.logoBrand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+  animation: popUp 0.8s ease-out;
+}
+
+.fullText {
+  font-family: 'Titillium Web', 'Segoe UI', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 1px;
+  background: linear-gradient(to right, #6a5acd, #d16ba5); /* Purple to pink */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: transform 0.3s ease, letter-spacing 0.3s ease;
+}
+
+.ai {
+  font-family: 'Titillium Web', 'Segoe UI', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-style: normal;
+  color: #d16ba5; /* Solid pink tone */
+  transition: transform 0.3s ease, letter-spacing 0.3s ease;
+}
+
+.logoBrand:hover .fullText,
+.logoBrand:hover .ai {
+  transform: scale(1.05);
+  letter-spacing: 1.5px;
+}
+
+/* Animations */
+@keyframes popUp {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+
+/* Animate form fields and button */
+.formGroup,
+.loginBtn {
+  animation: slideFade 0.8s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.formGroup:nth-child(1) { animation-delay: 0.3s; }
+.formGroup:nth-child(2) { animation-delay: 0.6s; }
+.loginBtn { animation-delay: 0.9s; }
+
+/* Slide + fade animation */
+@keyframes slideFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Match login button with title gradient */
+.loginBtn {
+  background: linear-gradient(to right, #6a5acd, #d16ba5);
+  box-shadow: 0 4px 12px rgba(209, 107, 165, 0.4);
+}
+
+.loginBtn:hover {
+  background: linear-gradient(to right, #d16ba5, #6a5acd);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(209, 107, 165, 0.6);
+}
+
+/* Input glow focus (match title tone) */
+.formInput:focus {
+  border-color: #d16ba5;
+  box-shadow: 0 0 0 3px rgba(209, 107, 165, 0.3);
+}
+
+/* Optional pulse animation on button */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(209, 107, 165, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(209, 107, 165, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(209, 107, 165, 0);
+  }
+}
+
+.loginBtn {
+  animation: pulse 2s infinite;
+}
+
+
+/* Bubble background */
+.bubbleBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.bubble {
+  position: absolute;
+  bottom: -120px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+  border-radius: 50%;
+  animation: rise linear infinite;
+  backdrop-filter: blur(2px);
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5));
+}
+
+
+
+.bubble:nth-child(1) { width: 60px; height: 60px; left: 5%; animation-duration: 10s; animation-delay: 0s; }
+.bubble:nth-child(2) { width: 35px; height: 35px; left: 15%; animation-duration: 8s; animation-delay: 1s; }
+.bubble:nth-child(3) { width: 45px; height: 45px; left: 30%; animation-duration: 12s; animation-delay: 2s; }
+.bubble:nth-child(4) { width: 20px; height: 20px; left: 45%; animation-duration: 9s; animation-delay: 0.5s; }
+.bubble:nth-child(5) { width: 55px; height: 55px; left: 60%; animation-duration: 11s; animation-delay: 1.5s; }
+.bubble:nth-child(6) { width: 25px; height: 25px; left: 75%; animation-duration: 10s; animation-delay: 2s; }
+.bubble:nth-child(7) { width: 50px; height: 50px; left: 85%; animation-duration: 9s; animation-delay: 1s; }
+.bubble:nth-child(8) { width: 30px; height: 30px; left: 20%; animation-duration: 13s; animation-delay: 1.2s; }
+.bubble:nth-child(9) { width: 40px; height: 40px; left: 50%; animation-duration: 10s; animation-delay: 0.8s; }
+.bubble:nth-child(10) { width: 60px; height: 60px; left: 90%; animation-duration: 14s; animation-delay: 2.2s; }
+
+
+@keyframes rise {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-300px) translateX(20px);
+    opacity: 0.25;
+  }
+  100% {
+    transform: translateY(-600px) translateX(-20px);
+    opacity: 0;
+  }
+}
+

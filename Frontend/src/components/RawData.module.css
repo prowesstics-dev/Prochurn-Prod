@@ -1,0 +1,193 @@
+/* Layout */
+.rawDataLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f7fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.rawDataContent {
+  flex: 1;
+  margin-left: 260px;
+  padding: 2rem;
+  background-color: #f5f7fa;
+}
+
+/* Header Section */
+.headerSection {
+  margin-bottom: 2.5rem;
+}
+
+.title {
+  color: #2c3e50;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #7f8c8d;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Steps Container */
+.stepsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Step Box */
+.stepBox {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stepBox:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.stepIcon {
+  font-size: 1.5rem;
+  color: #3498db;
+  margin-right: 0.75rem;
+}
+
+.stepTitle {
+  color: #2c3e50;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Step Details */
+.stepDetails {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.detailItem {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  color: #34495e;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.checkIcon {
+  color: #2ecc71;
+  font-size: 1rem;
+  margin-right: 0.75rem;
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+/* Profile Section */
+.profileContainer {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+  z-index: 1000;
+}
+
+.profileIcon {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.profileIcon:hover {
+  transform: scale(1.1);
+}
+
+.usernameBadge {
+  margin-left: 8px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.profileMenu {
+  position: absolute;
+  right: 0;
+  top: 50px;
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  min-width: 180px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.profileName {
+  display: flex;
+  align-items: center;
+  margin: 0 0 0.75rem 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.menuDivider {
+  border: none;
+  height: 1px;
+  background-color: #ecf0f1;
+  margin: 0.5rem 0;
+}
+
+.logoutOption {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: #e74c3c;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem;
+  width: 100%;
+  text-align: left;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.logoutOption:hover {
+  background-color: #f9f9f9;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .rawDataContent {
+      margin-left: 0;
+      padding: 1.5rem;
+      padding-top: 5rem;
+  }
+  
+  .stepsContainer {
+      grid-template-columns: 1fr;
+  }
+  
+  .profileContainer {
+      right: 20px;
+      top: 15px;
+  }
+}

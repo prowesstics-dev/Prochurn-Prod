@@ -1,0 +1,789 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
+import { useAuth } from "./AuthContext";
+import { FaSignOutAlt, FaCloudDownloadAlt,FaCalendarAlt, FaUserCircle, FaEye,FaInfoCircle,FaTimes  } from "react-icons/fa"; 
+import styles from "./UploadPage.module.css"; // ✅ Ensure styles are applied
+import { color } from "d3";
+import {Upload,Button,Popconfirm, message, Modal} from "antd";
+import { UploadOutlined } from '@ant-design/icons';
+
+import DatePicker from "react-datepicker"; // Import the DatePicker component
+import "react-datepicker/dist/react-datepicker.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+
+
+
+const MAX_FILE_SIZE_MB = 1024;
+const START_YEAR = 1980;
+const CURRENT_YEAR = new Date().getFullYear();
+
+function UploadPage() {
+    const API_URL = import.meta.env.VITE_API_URL ;
+    const { axiosInstance } = useAuth();
+    const navigate = useNavigate();
+    const [uploadedFiles, setUploadedFiles] = useState({ 
+        base: null, 
+        pr: null, 
+        claims: null, 
+        feedback: null, 
+        additional: []
+    });
+    const [username, setUsername] = useState("Guest");
+    const [fileData, setFileData] = useState({});
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [isTemplateModalVisible, setIsTemplateModalVisible] = useState(false);
+
+
+    const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR);
+    const [years, setYears] = useState([]);
+    const [showCalendar, setShowCalendar] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(null);
+
+    useEffect(() => {
+        // Populate the years dropdown dynamically
+        const yearOptions = [];
+        for (let i = CURRENT_YEAR; i >= START_YEAR; i--) {
+            yearOptions.push(i);
+        }
+        setYears(yearOptions);
+    }, []);
+
+    // useEffect(() => {
+    //     const token = localStorage.getItem("accessToken");
+
+    //     if (!token) {
+    //         console.warn("No token found! Redirecting to login...");
+    //         navigate("/login");
+    //         return;
+    //     }
+
+    //     fetch(`${API_URL}/user-details/`, {
+    //         method: "GET",
+    //         headers: {
+    //             "Authorization": `Bearer ${token}`,
+    //             "Content-Type": "application/json"
+    //         }
+    //     })
+    //     .then(response => {
+    //         if (!response.ok) throw new Error("Failed to fetch user details");
+    //         return response.json();
+    //     })
+    //     .then(data => {
+    //         if (data.username) setUsername(data.username);
+    //     })
+    //     .catch(error => {
+    //         console.error("Error fetching user details:", error);
+    //         Swal.fire("Error", "Failed to load user details. Please refresh.", "error");
+    //     });
+    // }, [navigate]);
+
+    const TEMPLATE_FILES = {
+        base: "/Excel_Templates/Base Template.xlsx".replace(/\\/g, "/"),
+        pr: "/Excel_Templates/PR Template.xlsx".replace(/\\/g, "/"),
+        claims: "/Excel_Templates/Claim Template.xlsx".replace(/\\/g, "/"),
+    };
+    
+    const [templateColumns, setTemplateColumns] = useState({});
+    const [templatesLoaded, setTemplatesLoaded] = useState(false);
+    
+    // ✅ Normalize headers: remove extra spaces, lowercase, and replace multiple spaces
+    // const normalizeHeaders = (headers) => {
+    //     return headers.map(header => 
+    //         header?.trim()
+    //             .toLowerCase()
+    //             .replace(/\s+/g, "_")  // ✅ Replace spaces with underscores
+    //             .replace(/[^a-z0-9_\d]/g, "") // ✅ Remove special characters
+    //     );
+    // };
+    
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+        if (date) {
+            const year = date.getFullYear();
+            setSelectedYear(year);
+        }
+        setShowCalendar(false); // Hide the calendar after selecting a date
+    };
+
+    useEffect(() => {
+        // Populate the years dropdown dynamically
+        const yearOptions = [];
+        for (let i = CURRENT_YEAR; i >= START_YEAR; i--) {
+            yearOptions.push(i);
+        }
+        setYears(yearOptions);
+    }, []);
+
+    const toggleCalendar = () => {
+        setShowCalendar(!showCalendar); // Toggle calendar visibility
+    };
+
+    // ✅ Load template headers before validation
+    // const loadTemplateColumns = async () => {
+    //     if (templatesLoaded) return; // Prevent multiple loads
+    
+    //     let newTemplateColumns = {};
+    
+    //     for (const [category, filePath] of Object.entries(TEMPLATE_FILES)) {
+    //         try {
+    //             const response = await fetch(filePath);
+    //             const blob = await response.blob();
+    //             const reader = new FileReader();
+    
+    //             reader.onload = (e) => {
+    //                 const data = new Uint8Array(e.target.result);
+    //                 const workbook = XLSX.read(data, { type: "array" });
+    //                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    //                 const headers = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0] || [];
+    
+    //                 newTemplateColumns[category] = normalizeHeaders(headers);
+    //                 setTemplateColumns(prev => ({ ...prev, ...newTemplateColumns }));
+    //             };
+    
+    //             reader.readAsArrayBuffer(blob);
+    //         } catch {
+    //             Swal.fire("Error", `Failed to load template: ${filePath}`, "error");
+    //         }
+    //     }
+        
+    //     setTemplatesLoaded(true);
+    // };
+    
+    // ✅ File Upload Handler with Validation
+    const handleFileUpload = async (event, category) => {
+    const files = event.target.files;
+    if (!files.length) return;
+
+    const file = files[0];
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+    const allowedExtensions = ["xlsx", "csv", "xlsb"];
+
+    if (category === "additional") {
+        setUploadedFiles(prev => ({
+            ...prev,
+            additional: [...prev.additional, ...Array.from(files)]
+        }));
+        return;
+    }
+
+    if (!allowedExtensions.includes(fileExtension)) {
+        message.error("Only .xlsx, .csv, and .xlsb files are allowed!");
+        return;
+    }
+
+    if (file.size / (1024 * 1024) > MAX_FILE_SIZE_MB) {
+        message.warning(`Max file size is ${MAX_FILE_SIZE_MB}MB.`);
+        return;
+    }
+    
+    const renamedFile = new File([file], `${selectedYear}_${category}.${fileExtension}`, { type: file.type });
+        setUploadedFiles(prev => ({ ...prev, [category]: renamedFile }));
+
+    // const fileHeaders = await getExcelHeaders(file);
+    // if (!fileHeaders.length) {
+    //     Swal.fire("Error", "Uploaded file contains no headers!", "error");
+    //     return;
+    // }
+
+    // ✅ Validate against expected template headers
+    // const requiredHeaders = templateColumns[category] || [];
+    // const missingColumns = requiredHeaders.filter(col => !fileHeaders.includes(col));
+
+    // if (missingColumns.length > 0) {
+    //     Swal.fire("Error", `Missing required columns: ${missingColumns.join(", ")}`, "error");
+    //     return;
+    // }
+
+    // Swal.fire({
+    //     title: "Uploading File...",
+    //     text: "Please wait while we upload your file.",
+    //     allowOutsideClick: false,
+    //     didOpen: () => {
+    //         Swal.showLoading();
+    //     }
+    // });
+
+    const normalizedCategory = category.replace(/\s+/g, "_").toLowerCase();
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("category", normalizedCategory);
+    const hideLoading = message.loading('Uploading file...', 0);
+
+    try {
+        const response = await fetch(`${API_URL}/upload-excel/`, {
+            method: "POST",
+            body: formData,
+        });
+
+        const data = await response.json();
+        hideLoading();
+        if (response.ok) {
+            setUploadedFiles(prev => ({ ...prev, [category]: file }));
+            message.success(`${file.name} uploaded successfully`);
+        } else {
+            throw new Error(data.message || "Upload failed!");
+        }
+    } catch (error) {
+        hideLoading();
+        Swal.fire("Error", error.message, "error");
+    }
+};
+
+    
+    
+    // const getExcelHeaders = (file) => {
+    //     return new Promise((resolve, reject) => {
+    //         const reader = new FileReader();
+    //         reader.onload = (e) => {
+    //             try {
+    //                 const data = new Uint8Array(e.target.result);
+    //                 const workbook = XLSX.read(data, { type: "array" });
+    //                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    //                 let headers = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0] || [];
+                    
+    //                 headers = normalizeHeaders(headers); // ✅ Apply normalization
+    //                 resolve(headers);
+    //             } catch (error) {
+    //                 reject(error);
+    //             }
+    //         };
+    //         reader.onerror = (error) => reject(error);
+    //         reader.readAsArrayBuffer(file);
+    //     });
+    // };
+    
+    
+    
+    
+    // ✅ Load template columns on first render
+    // useEffect(() => {
+    //     loadTemplateColumns();
+    // }, []);
+    
+    
+    
+    const handleDownloadTemplates = () => {
+  setIsTemplateModalVisible(true);
+};
+
+    
+    
+    const handleFeedbackInfo = () => {
+        Swal.fire({
+            title: "Customer Feedback Information",
+            text: "For the feedback, we haven’t provided any templates. You can upload the relevant data if you have.",
+            icon: "info",
+            confirmButtonText: "OK"
+        });
+    };
+    
+    const handleRemoveFile = async (category) => {
+    const file = uploadedFiles[category];
+    if (!file) return;
+
+    try {
+        const response = await fetch(`${API_URL}/delete-uploaded-file/?category=${category}&file_name=${encodeURIComponent(file.name)}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            setUploadedFiles(prev => ({ ...prev, [category]: null }));
+            const fileInput = document.getElementById(`file-input-${category}`);
+            if (fileInput) fileInput.value = "";
+        } else {
+            console.error("Error deleting file:", data.message);
+        }
+    } catch (error) {
+        console.error("Delete request failed:", error);
+    }
+};
+
+    
+    
+    
+
+    const handleRemoveAdditionalFile = (index) => {
+        setUploadedFiles(prev => {
+            const updatedFiles = prev.additional.filter((_, i) => i !== index);
+    
+            // Reset file input field when all files are removed
+            const fileInput = document.getElementById("file-input-additional");
+            if (fileInput && updatedFiles.length === 0) {
+                fileInput.value = "";
+            }
+    
+            return { ...prev, additional: updatedFiles };
+        });
+    };
+    
+    
+    const handleViewData = async (category) => {
+        try {
+            const normalizedCategory = category.replace(/\s+/g, "_").toLowerCase();
+
+            console.log("Fetching data for category:", normalizedCategory);
+            const response = await fetch(`${API_URL}/view-uploaded-data/?category=${normalizedCategory}`);
+            const data = await response.json();
+
+            if (!data.success) {
+                Swal.fire("Error", data.message, "error");
+                return;
+            }
+            console.log("Received Data:", data);
+            const rows = data.data;
+            const columnNames = Object.keys(rows[0]);
+            const rowCount = rows.length;
+            const columnCount = columnNames.length;
+
+            let tableHtml = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0;">${category.toUpperCase()} Data Preview</h3>
+                    <button id="closePreview" style="background: none; border: none; font-size: 15px; cursor: pointer; font-weight: bold; color: #FF0000;">❌</button>
+                </div>
+                <div style="margin-bottom: 10px; font-size: 14px; font-weight: bold; text-align: center;">
+                    <span style="color: #007BFF;">Total Rows:</span> ${rowCount} | 
+                    <span style="color: #007BFF;">Total Columns:</span> ${columnCount}
+                </div>
+                <div style="max-height: 500px; overflow: auto; border: 1px solid #ddd; padding: 10px;">
+                    <table style="border-collapse: collapse; width: 100%; font-size: 12px;">
+                        <thead>
+                            <tr style="background-color: #007BFF; color: white;">
+                                ${columnNames.map(col => `<th style="padding: 8px; border: 1px solid #ddd;">${col}</th>`).join("")}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows.map(row => `<tr>${columnNames.map(col => `<td style="padding: 8px; border: 1px solid #ddd;">${row[col] || ""}</td>`).join("")}</tr>`).join("")}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            Swal.fire({
+                html: tableHtml,
+                width: "90%",
+                showConfirmButton: false,
+                didOpen: () => {
+                    document.getElementById("closePreview").addEventListener("click", () => Swal.close());
+                },
+            });
+
+        } catch (error) {
+            Swal.fire("Error", "Failed to load data preview.", "error");
+        }
+    };
+
+    const handleLogout = () => {
+        Swal.fire({
+            title: "Logout?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+            cancelButtonText: "Cancel",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.clear();
+                navigate("/login");
+            }
+        });
+    };
+    const tooltips = {
+        base: "Contains the whole purchase data",
+        pr: "Contains the Policy renewed, new policies, and rollover details",
+        claims: "Contains claim-related details",
+        feedback: "Customer satisfaction data & churn reasons",
+        additional: "Any extra business-related data for better model accuracy",
+    };
+
+    const handleProcessData = async () => {
+        if (!uploadedFiles.base || !uploadedFiles.pr || !uploadedFiles.claims) {
+            Swal.fire("Error", "Please upload all required files.", "error");
+            return;
+        }
+    
+        Swal.fire({
+            title: "Processing Data...",
+            text: "Please wait while we process the uploaded files.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    
+        try {
+            const formData = new FormData();
+            formData.append("year", selectedYear);
+            formData.append("base", uploadedFiles.base);
+            formData.append("pr", uploadedFiles.pr);
+            formData.append("claims", uploadedFiles.claims);
+            if (uploadedFiles.feedback) {
+                formData.append("feedback", uploadedFiles.feedback);
+            }
+            uploadedFiles.additional.forEach(file => {
+                formData.append("additional", file);
+            });
+
+            const response = await fetch(`${API_URL}/process-uploaded-data/`, {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                Swal.fire("Processing Complete!", "Data stored successfully!", "success")
+                    .then(() => navigate("/datapreprocessing"));
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            Swal.fire("Error", error.message, "error");
+        }
+    };
+    
+    const isAllRequiredUploaded = uploadedFiles.base && uploadedFiles.pr && uploadedFiles.claims;
+
+    return (
+        <div className={styles.uploadpage}>
+            <button
+  onClick={() => navigate('/dataorchestration')}
+  className={styles.backButton}
+>
+  ⬅ Back
+</button>
+            <div className= {styles.headercontainer}>
+                <div className= {styles.titlecontainer}>
+                    <h1 className={styles.pageTitle}>
+  Upload Data Via Excel/CSV!
+</h1>
+                  
+
+                    <p className= {styles.subtext}>Please download the template and upload data.</p>
+                </div>
+                
+                
+            </div>
+    
+            <div className= {styles.controlscontainer}>
+                <button onClick={handleDownloadTemplates} className= {styles.downloadbtn}>
+                    <FaCloudDownloadAlt /> Download Template
+                </button>
+    
+                <div className={styles.yearselector}>
+                    <label>Select Year: </label>
+                    <div className={styles.datepickercontainer}>
+                        <button onClick={toggleCalendar} className={styles.calendariconbtn}>
+                            <FaCalendarAlt size={20} />
+                        </button>
+                        {showCalendar && (
+                            <DatePicker
+                                selected={selectedDate}
+                                onChange={handleDateChange}
+                                showYearPicker
+                                dateFormat="yyyy"
+                                className={styles.datepicker}
+                                popperPlacement="bottom"
+                                inline
+                            />
+                        )}
+                    </div>
+                    <span className={styles.selectedYear}>{selectedYear}</span>
+                </div>
+            
+            </div>
+    
+            <div className= {styles.fileuploadcontainer}>
+                {[
+                    { key: "base", label: "Customer Base Data", required: true },
+                    { key: "pr", label: "Policy Renewal Data", required: true },
+                    { key: "claims", label: "Claims History Data", required: true },
+                    { key: "feedback", label: "Customer Feedback Data", required: false, info: true },
+                    // { key: "additional", label: "Additional Data", required: false }
+                ].map(({ key, label, required, info }) => (
+                    <div className= {styles.filecard} key={key}>
+                        <div className= {styles.fileheader}>
+                            <div className= {styles.filetitle}>
+                                {required && <span className= {styles.required}>*</span>}
+                                <h4 className= {styles.filelabel}>{label}</h4>
+                                {info && (
+                                    <FaInfoCircle 
+                                        onClick={handleFeedbackInfo} 
+                                        className= {styles.infoicon}
+                                        title="More information about Customer Feedback"
+                                    />
+                                )}
+                            </div>
+                           
+                        </div>
+    
+                        <div className= {styles.fileinputwrapper}>
+                           <Upload
+  accept=".xlsx,.csv,.xlsb"
+  customRequest={({ file, onSuccess }) => {
+    setTimeout(() => {
+      handleFileUpload({ target: { files: [file] } }, key);
+      onSuccess("ok");
+    }, 100);
+  }}
+  showUploadList={{ showRemoveIcon: false }}
+  fileList={
+    uploadedFiles[key]
+      ? [{ name: uploadedFiles[key].name, status: "done" }]
+      : []
+  }
+>
+  <Button icon={<UploadOutlined />}>Upload</Button>
+</Upload>
+
+
+                            <span className={styles.tooltiptext}>{tooltips[key]}</span>
+                            {uploadedFiles[key] && key !== "additional" && (
+                                <div className= {styles.fileactions}>
+                                    {/* <button onClick={() => handleViewData(key)} className= {styles.actionbtnviewbtn} title="View Data">
+                                        <FaEye />
+                                    </button> */}
+                                    <Popconfirm
+  title="Are you sure to delete this file?"
+  onConfirm={() => handleRemoveFile(key)}
+  okText="Yes"
+  cancelText="No"
+>
+  <button className={styles.actionbtnremovebtn} title="Remove File">
+    <FaTimes />
+  </button>
+</Popconfirm>
+
+                                    
+                                </div>
+                            )}
+                        </div>
+    
+                        {key === "additional" && uploadedFiles.additional.length > 0 && (
+                            <div className= {styles.additionalfilescontainer}>
+                                <p className= {styles.filecount}>
+                                    {uploadedFiles.additional.length} {uploadedFiles.additional.length === 1 ? "file" : "files"}
+                                </p>
+                                <div className= {styles.additionalfileslist}>
+                                    {uploadedFiles.additional.map((file, index) => (
+                                        <div key={index} className= {styles.filechip}>
+                                            <span className= {styles.filename}>{file.name}</span>
+                                            <div className= {styles.filechipactions}>
+                                                {/* <button onClick={() => handleViewData(file)} className= {styles.actionbtnviewbtn} title="View Data">
+                                                    <FaEye />
+                                                </button> */}
+                                                <Popconfirm
+  title="Remove this additional file?"
+  onConfirm={() => handleRemoveAdditionalFile(index)}
+  okText="Yes"
+  cancelText="No"
+>
+  <button className={styles.actionbtnremovebtn} title="Remove File">
+    <FaTimes />
+  </button>
+</Popconfirm>
+                                               
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+    
+            {/* {isAllRequiredUploaded && (
+                <button onClick={handleProcessData} className= {styles.processbtn}>
+                    Process Data
+                </button>
+            )} */}
+
+            <Modal
+  title={
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <FaInfoCircle style={{ color: '#007BFF' }} />
+      <span style={{ fontWeight: 'bold' }}>Download Templates</span>
+    </div>
+  }
+  open={isTemplateModalVisible}
+  onCancel={() => setIsTemplateModalVisible(false)}
+  footer={null}
+  width={600}
+>
+  <div style={{
+    background: "#f8f9fa",
+    padding: "16px",
+    borderRadius: "8px",
+    borderLeft: "4px solid #007BFF",
+    marginBottom: "16px",
+    fontSize: "14px"
+  }}>
+    <span style={{ color: "#d9534f", fontWeight: "bold" }}>
+      Please use the below template to upload the data and if you have any additional data related to that file, ensure it is present after the mandatory columns.
+    </span>
+  </div>
+
+  <ul style={{
+    listStyle: "none",
+    padding: 0,
+    margin: 0,
+    fontSize: "14px"
+  }}>
+    <li style={{ marginBottom: "8px" }}>
+      📄 <a href={`${API_URL}/download-template/Customer Base Template.xlsx`} download style={{ fontWeight: "bold" }}>
+        Customer Base Template
+      </a>
+    </li>
+    <li style={{ marginBottom: "8px" }}>
+      📄 <a href={`${API_URL}/download-template/Policy Renewal Template.xlsx`} download style={{ fontWeight: "bold" }}>
+        Policy Renewal Template
+      </a>
+    </li>
+    <li>
+      📄 <a href={`${API_URL}/download-template/Claim History Template.xlsx`} download style={{ fontWeight: "bold" }}>
+        Claim History Template
+      </a>
+    </li>
+  </ul>
+</Modal>
+
+        </div>
+    );
+}
+
+
+export const UploadSection = ({
+  uploadedFiles,
+  setUploadedFiles,
+  selectedYear,
+  selectedDate,
+  setSelectedDate,
+  showCalendar,
+  setShowCalendar,
+  handleDateChange,
+  toggleCalendar,
+  handleDownloadTemplates,
+  handleFeedbackInfo,
+  handleFileUpload,
+  handleRemoveFile,
+  handleRemoveAdditionalFile,
+  handleProcessData,
+  isAllRequiredUploaded,
+  tooltips,
+}) => {
+  return (
+    <>
+      <div className={styles.controlscontainer}>
+        <button onClick={handleDownloadTemplates} className={styles.downloadbtn}>
+          <FaCloudDownloadAlt /> Access Template
+        </button>
+
+        <div className={styles.yearselector}>
+          <label>Select Year: </label>
+          <div className={styles.datepickercontainer}>
+            <button onClick={toggleCalendar} className={styles.calendariconbtn}>
+              <FaCalendarAlt size={20} />
+            </button>
+            {showCalendar && (
+              <DatePicker
+                selected={selectedDate}
+                onChange={handleDateChange}
+                showYearPicker
+                dateFormat="yyyy"
+                className={styles.datepicker}
+                popperPlacement="bottom"
+                inline
+              />
+            )}
+          </div>
+          <span className={styles.selectedYear}>{selectedYear}</span>
+        </div>
+      </div>
+
+      <div className={styles.fileuploadcontainer}>
+        {[
+          { key: "base", label: "Customer Base Data", required: true },
+          { key: "pr", label: "Policy Renewal Data", required: true },
+          { key: "claims", label: "Claims History Data", required: true },
+          { key: "feedback", label: "Customer Feedback Data", required: false, info: true },
+        ].map(({ key, label, required, info }) => (
+          <div className={styles.filecard} key={key}>
+            <div className={styles.fileheader}>
+              <div className={styles.filetitle}>
+                {required && <span className={styles.required}>*</span>}
+                <h4 className={styles.filelabel}>{label}</h4>
+                {info && (
+                  <FaInfoCircle
+                    onClick={handleFeedbackInfo}
+                    className={styles.infoicon}
+                    title="More information about Customer Feedback"
+                  />
+                )}
+              </div>
+            </div>
+
+            <div className={styles.fileinputwrapper}>
+              <input
+                type="file"
+                accept=".xlsx,.csv,.xlsb"
+                id={`file-input-${key}`}
+                onChange={(e) => handleFileUpload(e, key)}
+                className={styles.fileinput}
+              />
+              <span className={styles.tooltiptext}>{tooltips[key]}</span>
+              {uploadedFiles[key] && key !== "additional" && (
+                <div className={styles.fileactions}>
+                  <button
+                    onClick={() => handleRemoveFile(key)}
+                    className={styles.actionbtnremovebtn}
+                    title="Remove File"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {key === "additional" && uploadedFiles.additional.length > 0 && (
+              <div className={styles.additionalfilescontainer}>
+                {uploadedFiles.additional.map((file, index) => (
+                  <div key={index} className={styles.filechip}>
+                    <span className={styles.filename}>{file.name}</span>
+                    <div className={styles.filechipactions}>
+                      <button
+                        onClick={() => handleRemoveAdditionalFile(index)}
+                        className={styles.actionbtnremovebtn}
+                        title="Remove File"
+                      >
+                        <FaTimes />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      
+
+      {/* {isAllRequiredUploaded && (
+        <button onClick={handleProcessData} className={styles.processbtn}>
+          Process Data
+        </button>
+      )} */}
+      
+    </>
+    
+  );
+};
+
+
+export default UploadPage;

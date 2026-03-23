@@ -1,0 +1,66 @@
+.customButton {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: linear-gradient(45deg, #1fb6ff, #009eeb);
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.customButton:hover {
+  transform: translateY(-1px);
+}
+
+.customButton:hover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  transform: skewX(-20deg);
+  animation: shimmerHover 1s forwards;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes shimmerHover {
+  0% {
+    left: -75%;
+  }
+  100% {
+    left: 125%;
+  }
+}
+
+.buttonText,
+.buttonArrow {
+  position: relative;
+  z-index: 1;
+  color: white;
+}
+
+.buttonArrow {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.customButton:hover .buttonArrow {
+  transform: translateX(4px);
+}
