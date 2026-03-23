@@ -130,7 +130,9 @@ session_store = {}
 schema_context_store = {}
 conversation_memory_store = {}
 
-GROQ_API_KEY = "REMOVEDO9jU8fnQzOlZZpo4fuEHWGdyb3FYWyE009SHBsblFAwjeabQG8m9"
+load_dotenv()
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY_Churn")
 
 
 import uuid
@@ -175,6 +177,8 @@ import os
 import time
 import logging
 from typing import Optional
+
+
 
 from azure.ai.inference import ChatCompletionsClient
 from azure.ai.inference.models import SystemMessage, UserMessage
@@ -5082,8 +5086,8 @@ dataframe_map = {}
 vectorstore_map = {}
 conversation_memory = {}
 memory_cache = {}
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GROQ_API_KEY = "REMOVEDO9jU8fnQzOlZZpo4fuEHWGdyb3FYWyE009SHBsblFAwjeabQG8m9"
+GROQ_API_KEY = os.getenv("GROQ_API_KEY_Churn")
+
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
 os.environ["OPENAI_API_KEY"] = OPENROUTER_API_KEY 
 OPENROUTER_API_BASE = os.getenv("OPENROUTER_API_BASE", "https://openrouter.ai/api/v1")
