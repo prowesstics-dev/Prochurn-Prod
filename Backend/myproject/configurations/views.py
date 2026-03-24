@@ -1161,8 +1161,8 @@ from google_auth_oauthlib.flow import Flow
 SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
 # Same as your python script
-CRED = os.getenv("GMAIL_CREDENTIALS_FILE", "/home/prochurn/Prochurn/Backend/gmail/credentials.json")
-TOKEN_DIR = os.getenv("GMAIL_TOKEN_DIR", "/home/prochurn/Prochurn/Backend/gmail/token.json")
+CRED = os.getenv("GMAIL_CREDENTIALS_FILE", "/var/www/prowesstics/secure/gmail/credentials.json")
+TOKEN_DIR = os.getenv("GMAIL_TOKEN_DIR", "/var/www/prowesstics/secure/gmail/token.json")
 
 # IMPORTANT: must match your google oauth client redirect uri
 REDIRECT_URI = os.getenv("GMAIL_REDIRECT_URI", "http://127.0.0.1:8081/")
