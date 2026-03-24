@@ -103,7 +103,7 @@ const LoginPage = () => {
       <div className={styles.loginBox}>
         <div className={styles.logoContainer}>
           <h1 className={styles.logoBrand}>
-            <span className={styles.fullText}>ProChurn AI 1 2 3 4 5</span>
+            <span className={styles.fullText}>ProChurn AI</span>
           </h1>
         </div>
 
