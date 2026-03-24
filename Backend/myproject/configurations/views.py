@@ -1185,7 +1185,7 @@ def _token_path(config_id: str) -> str:
     os.makedirs(base_dir, exist_ok=True)
 
     # store per config
-    return os.path.join(base_dir, f"token_{safe}.json")
+    return os.path.join(base_dir, f"token.json")
 
 
 @csrf_exempt
