@@ -55,7 +55,7 @@ LOGGING = {
 
 
 
-ALLOWED_HOSTS = ['churn.prowesstics.space','churn.prowesstics.space/flask', "localhost",
+ALLOWED_HOSTS = ['churn.prowesstics.space','churn.ai.prowesstics.co.in','churn.ai.prowesstics.co.in/flask','churn.prowesstics.space/flask', "localhost",
     "127.0.0.1", "localhost:5173/"]
 
 
@@ -120,6 +120,7 @@ ROOT_URLCONF = 'myproject.urls'
 
 CSRF_TRUSTED_ORIGINS = [
     "https://churn.prowesstics.space",
+    "https://churn.ai.prowesstics.co.in",
     "http://localhost:5173",
 ]
 
@@ -127,6 +128,7 @@ CSRF_TRUSTED_ORIGINS = [
 # Celery Configuration
 CORS_ALLOWED_ORIGINS = [
     "https://churn.prowesstics.space",
+    "https://churn.ai.prowesstics.co.in",
     "http://localhost:5173",
 ]
 
