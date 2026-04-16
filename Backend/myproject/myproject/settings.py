@@ -323,7 +323,7 @@ EXTERNAL_DATABASES = {
 
 'DB_Azure_Prochurn_Airflow' :{
 
-    'host': "135.235.139.203",
+    'host': "20.244.31.74",
     'dbname': "prochurn",
     'user': "appadmin",
     'password': "prowesstics",
